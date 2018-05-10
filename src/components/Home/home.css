@@ -1,0 +1,98 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 60px;
+  padding: 20px;
+  color: white;
+}
+
+.App-title {
+  font-size: 1.5em;
+  color: white;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.logo {
+  width: 120px;
+  height: 31px;
+  background: rgba(255, 255, 255, .2);
+  margin: 16px 28px 16px 0;
+  float: left;
+}
+
+.header {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  height: 47px;
+  background-color: #fff;
+  z-index: 999;
+}
+
+.header .rightWarpper {
+  display: flex;
+  padding-right: 16px;
+}
+
+.button {
+  width: 47px;
+  height: 47px;
+  line-height: 45px;
+  text-align: center;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.fab-button {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  z-index: 10;
+  position: fixed !important;
+  right: 50px;
+  bottom: 50px;
+  height: 56px !important;
+  width: 56px !important;
+  font-size: 24px !important;
+  box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12), 0 3px 5px -1px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.list-user {
+  display: flex;
+  align-items: left;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.list-item {
+  padding-left: 10px;
+  white-space: nowrap;
+  overflow: -webkit-paged-x;
+  text-overflow: ellipsis;
+}
+
+.list-title {
+  padding-left: 10px;
+}

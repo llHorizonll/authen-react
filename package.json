@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "antd": "^3.5.0",
-    "firebase": "^4.12.1",
+    "firebase": "^4.13.1",
     "fullcalendar-reactwrapper": "^1.0.7",
     "moment": "^2.22.1",
     "react": "^16.3.0",
@@ -12,12 +12,23 @@
     "react-dom": "^16.3.0",
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.1.1",
-    "styled-components": "^3.2.6"
+    "styled-components": "^3.2.6",
+    "webpack": "^3.11.0"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && firebase deploy",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "storybook": "start-storybook -p 9009 -s public",
+    "build-storybook": "build-storybook -s public"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^8.2.3",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.11.0",
+    "eslint-plugin-jsx-a11y": "^5.0.1",
+    "eslint-plugin-react": "^7.7.0"
   }
 }
