@@ -69,7 +69,7 @@ const SignInForm = Form.create()(class SignInForm extends Component {
         <Form onSubmit={this.handleSubmit}>
           <FormItem hasFeedback>
             {getFieldDecorator('email', {
-              initialValue: '1234@gmail.com',
+              initialValue: (process.env.NODE_ENV === 'production') ? '' : 'newuser@mail.com',
               rules: [{ required: true, message: 'Please input your Email!' }],
             })(
               <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Email" />
@@ -77,7 +77,7 @@ const SignInForm = Form.create()(class SignInForm extends Component {
           </FormItem>
           <FormItem hasFeedback>
             {getFieldDecorator('password', {
-              initialValue: '123456',
+              initialValue: (process.env.NODE_ENV === 'production') ? '' : 'newuser@mail.com',
               rules: [{ required: true, message: 'Please input your Password!' }],
             })(
               <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="Password" />

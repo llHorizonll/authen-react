@@ -30,7 +30,7 @@ module.exports = {
     "valid-typeof": "warn",
     strict: 0,
     experimentalDecorators: 0,
-    "no-console": 0,
+    //"no-console": 0,
     "no-undefine": 0
     },
     settings: {

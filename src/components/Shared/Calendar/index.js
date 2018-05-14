@@ -4,9 +4,10 @@ import React, {
 import FullCalendar from 'fullcalendar-reactwrapper';
 import message from 'antd/lib/message';
 import Button from 'antd/lib/button';
-//import Modalbody from './Modalbody';
+import Modalbody from '../../Shared/Modal';
 import moment from 'moment';
 import './fullcalendar.css';
+
 export default class Calendar extends Component {
   constructor(props) {
     super(props);
@@ -46,7 +47,7 @@ export default class Calendar extends Component {
     }
 
     const showModalevent = (event) => {
-      if (this.props.user.username === event.source.name) {
+      if (this.props.user === event.username) {
         this.setState({
           visible: true,
           title: "Update Event",
@@ -56,6 +57,7 @@ export default class Calendar extends Component {
           enddate: (event.end) ? event.end.subtract(1, 'days') : event.start
         });
       } else {
+        // TODO: ADD CARD VIEW INFO SAME GOOGLE CALENDAR DESIGN
         message.error('You don’t have permission to edit this event', 1);
       }
     }
@@ -140,7 +142,7 @@ export default class Calendar extends Component {
     }
 
     return (
-      <div id="example-component" >
+      <div>
         <FullCalendar
           id="example-component"
           header={this.props.fullcalendarprop.header}
@@ -149,14 +151,15 @@ export default class Calendar extends Component {
           navLinks={true} // can click day/week names to navigate views
           editable={false}
           eventLimit={true} // allow "more" link when too many events
-          contentHeight={800} />
+          contentHeight={800} 
+        />
         <Button onClick={showModalselect}
           className="fab-button"
           type="primary" shape="circle" icon="plus" size="large" />
-        {/* <Modalbody
+        <Modalbody
           wrappedComponentRef={saveFormRef}
           {...modalProps}
-        /> */}
+        />
       </div >
     );
   }

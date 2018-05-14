@@ -2,6 +2,7 @@ import React, {
   Component
 } from 'react';
 import Layout from 'antd/lib/layout';
+import message from 'antd/lib/message';
 import moment from 'moment';
 import withAuthorization from '../Session/withAuthorization';
 
@@ -11,6 +12,9 @@ import Calendar from '../Shared/Calendar';
 import {
   db
 } from '../../firebase';
+import {
+  service
+} from '../../service';
 import './home.css';
 const {
   Content,
@@ -37,22 +41,47 @@ class HomePage extends Component {
       datasearch: '',
       datatemp: '',
       userlist: '',
-      maincolor: 'blue'
+      user: localStorage.getItem('username'),
+      maincolor: 'blue',
+      show: true,
     }
   }
 
   componentDidMount() {
-    db.getEventList().then(snapshot => {
-      //console.log(snapshot)
-      let arr = [];
-      snapshot.forEach(function (doc) {
-        arr.push(doc.data());
-      });
-      arr.map(item => item.start = moment(item.start.toDate()).format('YYYY-MM-DD'))
+
+    db.onceGetUsers().then(arr => {
+      let u = arr.filter((item) => {
+        if (this.state.user === item.username) {
+          item.show = true;
+        }
+        return item
+      })
       this.setState(() => ({
-        data: arr
+        userlist: u
       }))
     });
+
+    db.getEventList().then(arr => {
+      let r = arr.filter((item) => {
+        if (this.state.user === item.username) {
+          item.show = true;
+        } else {
+          item.show = false;
+        }
+        if (item.start) {
+          item.start = moment(item.start.toDate()).format('YYYY-MM-DD');
+        }
+        if (item.end) {
+          item.end = moment(item.end.toDate()).format('YYYY-MM-DD')
+        }
+        return item
+      })
+      this.setState(() => ({
+        data: r.filter(item => (item.show) ? item : ''),
+        datasearch: r,
+        datatemp: r.slice(),
+      }))
+    })
   }
 
   toggleOpencolor = () => {
@@ -102,12 +131,10 @@ class HomePage extends Component {
     if (!e.target.value) {
       e.target.value = ''
     }
-    // eventService.searchevent(e.target.value).then(res => {
-    //   this.setState({
-    //     data: res.filter(item => (item.show) ? item : ''),
-    //     datasearch: res,
-    //   })
-    // })
+    let result = service.searchevent(this.state.datasearch, e.target.value);
+    this.setState({
+      data: result.filter(item => (item.show) ? item : ''),
+    })
     this.setState({
       calendar: {
         defaultView: 'listMonth',
@@ -131,25 +158,137 @@ class HomePage extends Component {
         },
         searchvalue: e.target.value
       })
-      // eventService.get().then(res => {
-      //   this.setState({
-      //     data: res.filter(item => (item.show) ? item : ''),
-      //     datasearch: res,
-      //   })
-      // })
+      this.setState({
+        data: this.state.datasearch.filter(item => (item.show) ? item : ''),
+      })
     }
   }
 
-  addEvent({ title = '', startdate = '', enddate = '', description = '' }) {
-
+  handleCheckbox(name, value) {
+    this.setState({
+      userlist: this.state.userlist.filter((item) => {
+        if (item.username === name) {
+          item.show = value;
+        }
+        return item
+      }),
+      datasearch: this.state.datasearch.filter((item) => {
+        if (item.username === name) {
+          item.show = value;
+        }
+        return item
+      }),
+      data: this.state.datasearch.filter(item => (item.show) ? item : ''),
+    });
   }
 
-  updateEvent(event, newevent) {
-    
+  addEvent({
+    title = '',
+    startdate = '',
+    enddate = '',
+    description = ''
+  }) {
+    let newevent = {
+      title: title,
+      start: startdate._d,
+      end: (enddate.add(1, 'days'))._d,
+      description: description,
+      username: this.state.user
+    }
+    db.doCreateEvent(newevent).then(() => {
+      db.getEventList().then(arr => {
+        let r = arr.filter((item) => {
+          //console.log(item)
+          if (this.state.user === item.username) {
+            item.show = true;
+          } else {
+            item.show = false;
+          }
+          if (item.start) {
+            item.start = moment(item.start.toDate()).format('YYYY-MM-DD');
+          }
+          if (item.end) {
+            item.end = moment(item.end.toDate()).format('YYYY-MM-DD')
+          }
+          return item
+        })
+        this.setState(() => ({
+          data: r.filter(item => (item.show) ? item : ''),
+          datasearch: r,
+          datatemp: r.slice(),
+        }))
+      })
+    })
+    .catch(error => {
+      message.error(error, 1);
+    });
   }
 
-  deleteEvent(event) {
-  
+  updateEvent(e, ne) {
+    let newevent = {
+      title: ne.title,
+      start: ne.startdate._d,
+      end: ne.enddate._d,
+      description: ne.description,
+      username: this.state.user
+    }
+    db.doUpdateEvent(e.id, newevent).then(() => {
+        db.getEventList().then(arr => {
+          let r = arr.filter((item) => {
+            //console.log(item)
+            if (this.state.user === item.username) {
+              item.show = true;
+            } else {
+              item.show = false;
+            }
+            if (item.start) {
+              item.start = moment(item.start.toDate()).format('YYYY-MM-DD');
+            }
+            if (item.end) {
+              item.end = moment(item.end.toDate()).format('YYYY-MM-DD')
+            }
+            return item
+          })
+          this.setState(() => ({
+            data: r.filter(item => (item.show) ? item : ''),
+            datasearch: r,
+            datatemp: r.slice(),
+          }))
+        })
+      })
+      .catch(error => {
+        message.error(error, 1);
+      });
+  }
+
+  deleteEvent(e) {
+    db.doRemoveEvent(e.id).then(() => {
+        db.getEventList().then(arr => {
+          let r = arr.filter((item) => {
+            //console.log(item)
+            if (this.state.user === item.username) {
+              item.show = true;
+            } else {
+              item.show = false;
+            }
+            if (item.start) {
+              item.start = moment(item.start.toDate()).format('YYYY-MM-DD');
+            }
+            if (item.end) {
+              item.end = moment(item.end.toDate()).format('YYYY-MM-DD')
+            }
+            return item
+          })
+          this.setState(() => ({
+            data: r.filter(item => (item.show) ? item : ''),
+            datasearch: r,
+            datatemp: r.slice(),
+          }))
+        })
+      })
+      .catch(error => {
+        message.error(error, 1);
+      });
   }
 
 
@@ -158,7 +297,7 @@ class HomePage extends Component {
       maincolor: this.state.maincolor,
       displayColorPicker: this.state.displayColorPicker,
       opencolor: this.toggleOpencolor.bind(this),
-      closecolor: this.toggleClosecolor.bind(this),
+      //closecolor: this.toggleClosecolor.bind(this),
       //changecolor: this.toggleChangecolor.bind(this),
       collapsed: this.state.collapsed,
       toggle: this.toggleNavmenu.bind(this),
@@ -166,7 +305,7 @@ class HomePage extends Component {
       togglesearch: this.toggleBtnsearch.bind(this),
       btnsearch: this.state.btnsearch,
       searchvalue: this.state.searchvalue,
-      //user: this.state.user,
+      user: this.state.user,
     }
     const siderProps = {
       width: 200,
@@ -176,7 +315,9 @@ class HomePage extends Component {
       collapsed: this.state.collapsed,
     }
     const calendarProps = {
-      data: this.state.data,
+      data: [{
+        events: this.state.data
+      }],
       updateEvent: this.updateEvent.bind(this),
       addEvent: this.addEvent.bind(this),
       deleteEvent: this.deleteEvent.bind(this),
@@ -192,7 +333,9 @@ class HomePage extends Component {
               style={{ background: '#fff', borderRight: '1px solid #ddd', boxShadow: '2px 0px 2px #ddd' }}
               {...siderProps}
             >
-              {/* <List data={this.state.userlist} user={this.state.user} click={this.handleCheckbox.bind(this)} /> */}
+            <List data={this.state.userlist} 
+                  click={this.handleCheckbox.bind(this)}
+            />
             </Sider>
             <Layout>
               <Content style={{ background: '#fff', padding: 20, margin: 0, }}>

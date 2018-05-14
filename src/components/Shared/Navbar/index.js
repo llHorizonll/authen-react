@@ -1,4 +1,7 @@
 import React from 'react';
+
+import AuthUserContext from '../../Session/AuthUserContext';
+
 import {
   Layout,
   Input,
@@ -19,7 +22,7 @@ const {
 const Span = styled.span `
     line-height: 42px;
     cursor:pointer;
-    padding: 0 20px;`
+`
 const popover = {
   position: 'absolute',
   zIndex: '5',
@@ -45,8 +48,9 @@ const menu = (
   </Menu>
 );
 
+// TODO: ADD CHANGE COLOR FOR USER
+
 const Navbar = ({
-  //user,
   displayColorPicker,
   opencolor,
   closecolor,
@@ -101,7 +105,11 @@ const Navbar = ({
           <Dropdown overlay={menu} trigger={['click']}>
             <Span>
               <Avatar icon="user" />
-              {/* <span className="list-title" style={{ color: user.color }}>{user.username}</span> */}
+              <AuthUserContext.Consumer>
+                {authUser =>
+                  <span className="list-title" style={{ color: 'red' }}>{authUser.displayName}</span>
+                }
+              </AuthUserContext.Consumer>
             </Span>
           </Dropdown>
           {/* <Avatar icon="user" /> {user} */}

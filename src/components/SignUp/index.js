@@ -18,6 +18,8 @@ import {
 } from '../../firebase';
 import * as routes from '../../constants/routes';
 
+// TODO: ADD FIELD COLOR FOR USER
+
 const FormItem = Form.Item;
 
 const SignUpPage = ({
@@ -46,8 +48,9 @@ const SignUpForm = Form.create()(class SignUpForm extends Component {
       if (!err) {
         auth.doCreateUserWithEmailAndPassword(values.email, values.password)
           .then(authUser => {
+            authUser.updateProfile({'displayName':values.username});
             // Create a user in your own accessible Firebase Database too
-            db.doCreateUser(authUser.uid, values.username, values.email)
+            db.doCreateUser(values.username, values.email)
               .then(() => {
                 history.push(routes.HOME);
               })

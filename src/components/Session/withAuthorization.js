@@ -1,8 +1,12 @@
 import React from 'react';
-import { withRouter } from 'react-router-dom';
+import {
+  withRouter
+} from 'react-router-dom';
 
 import AuthUserContext from './AuthUserContext';
-import { firebase } from '../../firebase';
+import {
+  firebase
+} from '../../firebase';
 import * as routes from '../../constants/routes';
 
 const withAuthorization = (condition) => (Component) => {
@@ -11,6 +15,8 @@ const withAuthorization = (condition) => (Component) => {
       firebase.auth.onAuthStateChanged(authUser => {
         if (!condition(authUser)) {
           this.props.history.push(routes.SIGN_IN);
+        } else {
+          localStorage.setItem('username',authUser.displayName)
         }
       });
     }
