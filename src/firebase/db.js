@@ -13,11 +13,19 @@ export const doCreateUser = (username, email) =>
     email,
   });
 
+  export const doUpdateColorUser = (id, color) =>
+  usersCollectionRef.doc(id).update(color)
+
 export const onceGetUsers = () => {
   return usersCollectionRef.get().then(snapshot => {
     let arr = [];
     snapshot.forEach(function (doc) {
-      arr.push(doc.data());
+      arr.push({
+        email: doc.data().email,
+        username: doc.data().username,
+        color: doc.data().color,
+        id: doc.id,
+      })
     })
     return arr
   })
@@ -33,6 +41,7 @@ export const getEventList = () => {
         start: doc.data().start,
         title: doc.data().title,
         username: doc.data().username,
+        color: doc.data().color,
         id: doc.id,
       })
     })
@@ -45,6 +54,9 @@ export const doCreateEvent = (event) =>
 
 export const doUpdateEvent = (id, event) =>
   eventsCollectionRef.doc(id).set(event)
+
+export const doUpdateColorEvent = (id, color) =>
+  eventsCollectionRef.doc(id).update(color)
 
 export const doRemoveEvent = (id) =>
   eventsCollectionRef.doc(id).delete()

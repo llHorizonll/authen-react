@@ -8,7 +8,6 @@ export const doSignInWithEmailAndPassword = (email, password) => auth.signInWith
 
 // Sign out
 export const doSignOut = () => {
-  localStorage.removeItem('username');
   auth.signOut();
 }
 

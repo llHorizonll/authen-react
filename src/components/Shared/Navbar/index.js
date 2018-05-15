@@ -1,7 +1,6 @@
 import React from 'react';
 
 import AuthUserContext from '../../Session/AuthUserContext';
-
 import {
   Layout,
   Input,
@@ -51,11 +50,12 @@ const menu = (
 // TODO: ADD CHANGE COLOR FOR USER
 
 const Navbar = ({
+  user,
+  usercolor,
   displayColorPicker,
   opencolor,
   closecolor,
   changecolor,
-  maincolor,
   collapsed,
   toggle,
   search,
@@ -107,7 +107,7 @@ const Navbar = ({
               <Avatar icon="user" />
               <AuthUserContext.Consumer>
                 {authUser =>
-                  <span className="list-title" style={{ color: 'red' }}>{authUser.displayName}</span>
+                  <span className="list-title" style={{ color: usercolor }}>{authUser.displayName}</span>
                 }
               </AuthUserContext.Consumer>
             </Span>
@@ -117,7 +117,7 @@ const Navbar = ({
       </Header >
       {displayColorPicker ? <div style={popover}>
         <div style={cover} onClick={closecolor} />
-        <CirclePicker width="220px" color={maincolor} onChange={changecolor} />
+        <CirclePicker width="220px" color={usercolor} onChange={changecolor} />
       </div> : null}
     </div>
   )

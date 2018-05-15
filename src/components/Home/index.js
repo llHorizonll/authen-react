@@ -41,29 +41,31 @@ class HomePage extends Component {
       datasearch: '',
       datatemp: '',
       userlist: '',
-      user: localStorage.getItem('username'),
-      maincolor: 'blue',
+      usercolor: '',
       show: true,
     }
   }
 
   componentDidMount() {
-
+    
     db.onceGetUsers().then(arr => {
       let u = arr.filter((item) => {
-        if (this.state.user === item.username) {
+        if (this.props.authUser.displayName === item.username) {
+          this.setState({
+            usercolor: item.color
+          })
           item.show = true;
         }
         return item
       })
-      this.setState(() => ({
+      this.setState({
         userlist: u
-      }))
+      })
     });
 
     db.getEventList().then(arr => {
       let r = arr.filter((item) => {
-        if (this.state.user === item.username) {
+        if (this.props.authUser.displayName === item.username) {
           item.show = true;
         } else {
           item.show = false;
@@ -102,6 +104,52 @@ class HomePage extends Component {
     });
   }
 
+  toggleChangecolor = (color) => {
+    this.setState({
+      usercolor: color.hex
+    })
+
+    let newdata = this.state.data.filter(item => {
+      if (this.props.authUser.displayName === item.username) {
+        item.color = color.hex
+        db.doUpdateColorEvent(item.id, {
+          color: item.color
+        })
+      }
+      return item;
+    });
+
+    let newdatauser = this.state.userlist.filter(item => {
+      if (this.props.authUser.displayName === item.username) {
+        item.color = color.hex
+        db.doUpdateColorUser(item.id, {
+          color: item.color
+        })
+      }
+      return item;
+    });
+
+    this.setState({
+      data: newdata,
+      userlist: newdatauser
+    })
+
+    // FIXME: UPDATE COLOR TO SERVICE
+
+    // eventService.update(newdata).then(res => {
+    //   this.setState({
+    //     data: res,
+    //   })
+    // })
+
+    // userService.update(newdatauser).then(res => {
+    //   this.setState({
+    //     userlist: res,
+    //     user: JSON.parse(localStorage.getItem('user')),
+    //   })
+    // })
+  }
+
   toggleBtnsearch = () => {
     this.setState({
       btnsearch: !this.state.btnsearch,
@@ -118,12 +166,6 @@ class HomePage extends Component {
         },
         searchvalue: ''
       });
-      // eventService.update().then(res => {
-      //   this.setState({
-      //     data: res.filter(item => (item.show) ? item : ''),
-      //     datasearch: res,
-      //   })
-      // })
     }
   }
 
@@ -193,50 +235,50 @@ class HomePage extends Component {
       start: startdate._d,
       end: (enddate.add(1, 'days'))._d,
       description: description,
-      username: this.state.user
+      username: this.props.authUser.displayName,
+      color: this.state.usercolor,
     }
     db.doCreateEvent(newevent).then(() => {
-      db.getEventList().then(arr => {
-        let r = arr.filter((item) => {
-          //console.log(item)
-          if (this.state.user === item.username) {
-            item.show = true;
-          } else {
-            item.show = false;
-          }
-          if (item.start) {
-            item.start = moment(item.start.toDate()).format('YYYY-MM-DD');
-          }
-          if (item.end) {
-            item.end = moment(item.end.toDate()).format('YYYY-MM-DD')
-          }
-          return item
+        db.getEventList().then(arr => {
+          let r = arr.filter((item) => {
+            if (this.props.authUser.displayName === item.username) {
+              item.show = true;
+            } else {
+              item.show = false;
+            }
+            if (item.start) {
+              item.start = moment(item.start.toDate()).format('YYYY-MM-DD');
+            }
+            if (item.end) {
+              item.end = moment(item.end.toDate()).format('YYYY-MM-DD')
+            }
+            return item
+          })
+          this.setState(() => ({
+            data: r.filter(item => (item.show) ? item : ''),
+            datasearch: r,
+            datatemp: r.slice(),
+          }))
         })
-        this.setState(() => ({
-          data: r.filter(item => (item.show) ? item : ''),
-          datasearch: r,
-          datatemp: r.slice(),
-        }))
       })
-    })
-    .catch(error => {
-      message.error(error, 1);
-    });
+      .catch(error => {
+        message.error(error, 1);
+      });
   }
 
   updateEvent(e, ne) {
     let newevent = {
       title: ne.title,
       start: ne.startdate._d,
-      end: ne.enddate._d,
+      end: (ne.enddate.add(1, 'days'))._d,
       description: ne.description,
-      username: this.state.user
+      username: this.props.authUser.displayName,
+      color: this.state.usercolor,
     }
     db.doUpdateEvent(e.id, newevent).then(() => {
         db.getEventList().then(arr => {
           let r = arr.filter((item) => {
-            //console.log(item)
-            if (this.state.user === item.username) {
+            if (this.props.authUser.displayName === item.username) {
               item.show = true;
             } else {
               item.show = false;
@@ -265,8 +307,7 @@ class HomePage extends Component {
     db.doRemoveEvent(e.id).then(() => {
         db.getEventList().then(arr => {
           let r = arr.filter((item) => {
-            //console.log(item)
-            if (this.state.user === item.username) {
+            if (this.props.authUser.displayName === item.username) {
               item.show = true;
             } else {
               item.show = false;
@@ -291,21 +332,20 @@ class HomePage extends Component {
       });
   }
 
-
   render() {
     const navbarProps = {
-      maincolor: this.state.maincolor,
+      usercolor: this.state.usercolor,
       displayColorPicker: this.state.displayColorPicker,
       opencolor: this.toggleOpencolor.bind(this),
-      //closecolor: this.toggleClosecolor.bind(this),
-      //changecolor: this.toggleChangecolor.bind(this),
+      closecolor: this.toggleClosecolor.bind(this),
+      changecolor: this.toggleChangecolor.bind(this),
       collapsed: this.state.collapsed,
       toggle: this.toggleNavmenu.bind(this),
       search: this.searchevent.bind(this),
       togglesearch: this.toggleBtnsearch.bind(this),
       btnsearch: this.state.btnsearch,
       searchvalue: this.state.searchvalue,
-      user: this.state.user,
+      user: this.props.authUser.displayName,
     }
     const siderProps = {
       width: 200,
@@ -316,13 +356,15 @@ class HomePage extends Component {
     }
     const calendarProps = {
       data: [{
-        events: this.state.data
+        events: this.state.data,
+        color: this.state.data.color,
+        textColor: "white",
       }],
       updateEvent: this.updateEvent.bind(this),
       addEvent: this.addEvent.bind(this),
       deleteEvent: this.deleteEvent.bind(this),
       fullcalendarprop: this.state.calendar,
-      user: this.state.user,
+      user: this.props.authUser.displayName,
     }
     return (
       <div className="App">
@@ -333,7 +375,7 @@ class HomePage extends Component {
               style={{ background: '#fff', borderRight: '1px solid #ddd', boxShadow: '2px 0px 2px #ddd' }}
               {...siderProps}
             >
-            <List data={this.state.userlist} 
+            <List user={this.state.userlist} 
                   click={this.handleCheckbox.bind(this)}
             />
             </Sider>
@@ -348,16 +390,6 @@ class HomePage extends Component {
     );
   }
 }
-
-// const UserList = ({ users }) =>
-//   <div>
-//     <h2>List of Usernames of Users</h2>
-//     <p>(Saved on Sign Up in Firebase Database)</p>
-
-//     {Object.keys(users).map(key =>
-//       <div key={key}>Username : {users[key].username}</div>
-//     )}
-//   </div>
 
 const authCondition = (authUser) => !!authUser;
 

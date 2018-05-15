@@ -64,6 +64,7 @@ export default class Calendar extends Component {
 
     const handleCreate = () => {
       this.setState({
+        visible: false, 
         confirmLoading: true,
       });
       const form = this.formRef.props.form;

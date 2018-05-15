@@ -15,8 +15,6 @@ const withAuthorization = (condition) => (Component) => {
       firebase.auth.onAuthStateChanged(authUser => {
         if (!condition(authUser)) {
           this.props.history.push(routes.SIGN_IN);
-        } else {
-          localStorage.setItem('username',authUser.displayName)
         }
       });
     }
@@ -24,7 +22,7 @@ const withAuthorization = (condition) => (Component) => {
     render() {
       return (
         <AuthUserContext.Consumer>
-          {authUser => authUser ? <Component /> : null}
+          {authUser => authUser ? <Component authUser={authUser} /> : null}
         </AuthUserContext.Consumer>
       );
     }
