@@ -25,7 +25,10 @@ const List = ({
               onChange={onChange}
               style={{ color: item.color }}
             >               
+              {item.photo ?
+              <Avatar src={item.photo} /> :
               <Avatar icon="user" />
+              }
               <span className="list-title">{item.username}</span>
             </Checkbox>
           </div>
@@ -37,7 +40,7 @@ const List = ({
   const listItems = getList(user)
 
   return (
-    <div style={{ padding: '10px' }}>
+    <div style={{ paddingLeft: '10px' }}>
       {listItems} 
     </div>
   )

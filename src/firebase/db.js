@@ -7,13 +7,23 @@ const usersCollectionRef = db.collection('users');
 //Event API
 const eventsCollectionRef = db.collection('events');
 
-export const doCreateUser = (username, email) =>
-  usersCollectionRef.add({
-    username,
-    email,
-  });
 
-  export const doUpdateColorUser = (id, color) =>
+
+export const doCreateUser = (username, email = '', photo = '') => {
+  let colorarr = ["#f44336", "#e91e63", "#9c27b0", "#673ab7", "#3f51b5", "#2196f3", "#03a9f4", "#00bcd4", "#009688",
+    "#4caf50", "#8bc34a", "#cddc39", "#ffeb3b", "#ffc107", "#ff9800", "#ff5722", "#795548", "#607d8b"
+  ]
+  let color = colorarr[Math.floor(Math.random() * colorarr.length)];
+  return usersCollectionRef.add({
+    username,
+    color,
+    email,
+    photo
+  });
+}
+
+
+export const doUpdateColorUser = (id, color) =>
   usersCollectionRef.doc(id).update(color)
 
 export const onceGetUsers = () => {
@@ -24,6 +34,7 @@ export const onceGetUsers = () => {
         email: doc.data().email,
         username: doc.data().username,
         color: doc.data().color,
+        photo: doc.data().photo,
         id: doc.id,
       })
     })

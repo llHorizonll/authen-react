@@ -7,9 +7,9 @@ body {
 
 .form-login {
   position: relative;
-  margin: 200px auto;
+  margin: 160px auto;
   width: 320px;
-  height: 360px;
+  height: 440px;
   padding: 36px;
   -webkit-box-shadow: 0 0 100px rgba(0, 0, 0, .08);
   box-shadow: 0 0 100px rgba(0, 0, 0, .08);

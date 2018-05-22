@@ -81,9 +81,11 @@
 
 .list-user {
   display: flex;
-  align-items: left;
   padding-top: 12px;
   padding-bottom: 12px;
+  white-space: nowrap;
+  width: 180px;
+  overflow: hidden;
 }
 
 .list-item {

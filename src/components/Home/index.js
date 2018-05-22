@@ -47,7 +47,7 @@ class HomePage extends Component {
   }
 
   componentDidMount() {
-    
+
     db.onceGetUsers().then(arr => {
       let u = arr.filter((item) => {
         if (this.props.authUser.displayName === item.username) {
@@ -254,10 +254,12 @@ class HomePage extends Component {
             }
             return item
           })
+          let newarr = service.arrayUnique(this.state.datasearch.filter(item => (item.show) ? item : '')
+            .concat(r.filter(item => (item.show) ? item : '')))
           this.setState(() => ({
-            data: r.filter(item => (item.show) ? item : ''),
-            datasearch: r,
-            datatemp: r.slice(),
+            data: newarr,
+            datasearch: newarr,
+            datatemp: newarr.slice(),
           }))
         })
       })
@@ -291,10 +293,13 @@ class HomePage extends Component {
             }
             return item
           })
+          let newarr = this.state.datasearch.filter(item =>
+              (this.props.authUser.displayName !== item.username && item.show) ? item : '')
+                .concat(r.filter(item => (item.show) ? item : ''))
           this.setState(() => ({
-            data: r.filter(item => (item.show) ? item : ''),
-            datasearch: r,
-            datatemp: r.slice(),
+            data: newarr,
+            datasearch: newarr,
+            datatemp: newarr.slice(),
           }))
         })
       })
@@ -306,7 +311,7 @@ class HomePage extends Component {
   deleteEvent(e) {
     db.doRemoveEvent(e.id).then(() => {
         db.getEventList().then(arr => {
-          let r = arr.filter((item) => {
+          arr.filter((item) => {
             if (this.props.authUser.displayName === item.username) {
               item.show = true;
             } else {
@@ -320,10 +325,13 @@ class HomePage extends Component {
             }
             return item
           })
+          let delarr = this.state.datasearch
+            .filter(item => (item.show) ? item : '')
+            .filter(item => item.id !== e.id)
           this.setState(() => ({
-            data: r.filter(item => (item.show) ? item : ''),
-            datasearch: r,
-            datatemp: r.slice(),
+            data: delarr,
+            datasearch: delarr,
+            datatemp: delarr.slice(),
           }))
         })
       })

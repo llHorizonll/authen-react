@@ -104,10 +104,15 @@ const Navbar = ({
           </div>
           <Dropdown overlay={menu} trigger={['click']}>
             <Span>
-              <Avatar icon="user" />
               <AuthUserContext.Consumer>
                 {authUser =>
+                <div>
+                 {(authUser.photoURL) ?
+                  <Avatar src={authUser.photoURL} /> :
+                  <Avatar icon="user" />
+                 }
                   <span className="list-title" style={{ color: usercolor }}>{authUser.displayName}</span>
+                </div>
                 }
               </AuthUserContext.Consumer>
             </Span>

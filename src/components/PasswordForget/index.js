@@ -42,7 +42,6 @@ const PasswordForgetForm = Form.create()(class PasswordForgetForm extends Compon
     this.props.form.validateFieldsAndScroll((err, values) => {
       event.preventDefault();
       if (!err) {
-        console.log(values.email)
         auth.doPasswordReset(values.email)
           .then((r) => {
             message.success("Password reset request sent please check your email", 7);

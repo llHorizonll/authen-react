@@ -18,7 +18,8 @@ import {
   PasswordForgetLink
 } from '../PasswordForget';
 import {
-  auth
+  auth,
+  db
 } from '../../firebase';
 import * as routes from '../../constants/routes';
 
@@ -37,6 +38,38 @@ const showerror = (value) => {
 
 const SignInForm = Form.create()(class SignInForm extends Component {
 
+
+  componentDidMount() {
+    window.addEventListener('beforeunload', window.gapi.signin2.render('my-signin2', {
+      'scope': 'https://www.googleapis.com/auth/plus.login',
+      'width': 200,
+      'height': 40,
+      'longtitle': true,
+      'theme': 'light',
+      'onsuccess': this.onSignIn
+    }));
+  }
+
+  onSignIn = () => {
+    const {
+      history
+    } = this.props;
+
+    auth.doSignInGoogle()
+      .then((res) => {
+        if (res.additionalUserInfo.isNewUser) {
+          db.doCreateUser(res.additionalUserInfo.profile.name, '', res.additionalUserInfo.profile.picture)
+            .then(() => {
+              history.push(routes.HOME);
+            })
+            .catch(error => {
+              showerror(error);
+            });
+        } else {
+          history.push(routes.HOME);
+        }
+      })
+  }
   handleSubmit = (event) => {
     const {
       history
@@ -87,6 +120,9 @@ const SignInForm = Form.create()(class SignInForm extends Component {
             <Button type="primary" htmlType="submit" className="login-form-button">
               Sign in
             </Button>
+          </FormItem>
+          <FormItem>
+            <div id="my-signin2"></div>
           </FormItem>
           <PasswordForgetLink />
           <SignUpLink />
